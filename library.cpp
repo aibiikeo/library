@@ -9,7 +9,7 @@ void loginInfo (string *loginUser, string *passwordUser){
     cin >> *passwordUser;
 }
 
-void readerLogin(string loginUser, string passwordUser){
+bool readerLogin(string loginUser, string passwordUser){
     string loginPasswordTxt, loginTxt, passwordTxt;
     ifstream fin;
         fin.open("readers.txt");
@@ -21,7 +21,7 @@ void readerLogin(string loginUser, string passwordUser){
                 loginTxt = loginPasswordTxt.substr(0, dividerPosition);
                 passwordTxt = loginPasswordTxt.substr(dividerPosition + 1);
                 if (loginUser == loginTxt && passwordUser == passwordTxt){
-                    cout << "You entered" << endl;
+                    return true;
                     break;
                 }
             }
@@ -30,9 +30,10 @@ void readerLogin(string loginUser, string passwordUser){
             cout << "readers.txt doesn't open" << endl;
             
         fin.close();
+    return false;
 }
 
-void librarianLogin(string loginUser, string passwordUser){
+bool librarianLogin(string loginUser, string passwordUser){
     string loginPasswordTxt, loginTxt, passwordTxt;
     ifstream fin;
         fin.open("librarian.txt");
@@ -44,7 +45,7 @@ void librarianLogin(string loginUser, string passwordUser){
                 loginTxt = loginPasswordTxt.substr(0, dividerPosition);
                 passwordTxt = loginPasswordTxt.substr(dividerPosition + 1);
                 if (loginUser == loginTxt && passwordUser == passwordTxt){
-                    cout << "You entered" << endl;
+                    return true;
                     break;
                 }
             }
@@ -53,6 +54,7 @@ void librarianLogin(string loginUser, string passwordUser){
             cout << "librarian.txt doesn't open" << endl;
         
         fin.close();
+    return false;
 }
 
 int main()
@@ -63,11 +65,28 @@ int main()
     
     loginInfo (&loginUser, &passwordUser);
     
-    if (accType == "reader"){
-        readerLogin(loginUser, passwordUser);
+    if(readerLogin(loginUser, passwordUser)){
+        // cout << "You entered" << endl;
+        cout << "--------MENU--------\n";
+        cout << "1.All books\n";
+        cout << "2.Search book\n";
+        cout << "3.Add to Favourites\n";
+        cout << "4.My Favourites\n";
+        cout << "5.My Balance\n";
+        cout << "6.Buy a book\n";
+        cout << "7.Exit\n";
+        cout << "--------------------\n";
+        
     }
-    else if (accType == "librarian"){
-        librarianLogin(loginUser, passwordUser);
+    
+    else if(librarianLogin(loginUser, passwordUser)){
+        cout << "--------MENU--------\n";
+        cout << "1.All books\n";
+        cout << "2.Search book\n";
+        cout << "3.All Readers\n";
+        cout << "4.Search reader\n";
+        cout << "5.Exit\n";
+        cout << "--------------------\n";
     }
     
     return 0;
