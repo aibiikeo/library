@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 using namespace std;
 
 void accountType (string *accType){
@@ -21,6 +22,7 @@ void loginInfo (string *loginUser, string *passwordUser){
 
 bool readerLogin(string loginUser, string passwordUser){
     string loginPasswordTxt, loginTxt, passwordTxt;
+    vector <string> allLoginTxt, allPasswordTxt;
     ifstream fin;
         fin.open("readers.txt");
         if(fin.is_open()){
@@ -30,21 +32,28 @@ bool readerLogin(string loginUser, string passwordUser){
                 int dividerPosition = loginPasswordTxt.find(" ");
                 loginTxt = loginPasswordTxt.substr(0, dividerPosition);
                 passwordTxt = loginPasswordTxt.substr(dividerPosition + 1);
-                if (loginUser == loginTxt && passwordUser == passwordTxt){
+                allPasswordTxt.push_back(passwordTxt);
+                allLoginTxt.push_back(loginTxt);
+            }
+            for (int i = 0; i < allPasswordTxt.size(); i++){
+                if (loginUser == allLoginTxt[i] && passwordUser == allPasswordTxt[i]){
                     return true;
                     break;
                 }
             }
+            
         }
         else
             cout << "readers.txt doesn't open" << endl;
             
         fin.close();
+    cout << "You're not registered yet." << endl;
     return false;
 }
 
 bool librarianLogin(string loginUser, string passwordUser){
     string loginPasswordTxt, loginTxt, passwordTxt;
+    vector <string> allLoginTxt, allPasswordTxt;
     ifstream fin;
         fin.open("librarian.txt");
         if(fin.is_open()){
@@ -54,7 +63,11 @@ bool librarianLogin(string loginUser, string passwordUser){
                 int dividerPosition = loginPasswordTxt.find(" ");
                 loginTxt = loginPasswordTxt.substr(0, dividerPosition);
                 passwordTxt = loginPasswordTxt.substr(dividerPosition + 1);
-                if (loginUser == loginTxt && passwordUser == passwordTxt){
+                allPasswordTxt.push_back(passwordTxt);
+                allLoginTxt.push_back(loginTxt);
+            }
+            for (int i = 0; i < allPasswordTxt.size(); i++){
+                if (loginUser == allLoginTxt[i] && passwordUser == allPasswordTxt[i]){
                     return true;
                     break;
                 }
@@ -64,6 +77,7 @@ bool librarianLogin(string loginUser, string passwordUser){
             cout << "librarian.txt doesn't open" << endl;
         
         fin.close();
+    cout << "You're not registered yet." << endl;
     return false;
 }
 
@@ -177,6 +191,7 @@ string searchBook() {
                     while(!fin.eof()){
                         book = "";
                         getline(fin,book);
+                        // int dividerPosition1 = book.find("-") + 1;
                         int dividerPosition2;
                         int findDividerPosition2 = -1;
                         do {
@@ -206,8 +221,7 @@ int main()
     accountType(&accType);
     loginInfo (&loginUser, &passwordUser);
     
-    if(accType == "reader"){
-        readerLogin(loginUser, passwordUser);
+    if(accType == "reader" && readerLogin(loginUser, passwordUser)){
         int option;
         readerMenu();
         
@@ -249,8 +263,7 @@ int main()
         }
     }
     
-    else if(accType == "librarian"){
-        librarianLogin(loginUser, passwordUser);
+    else if(accType == "librarian" && librarianLogin(loginUser, passwordUser)){
         int option;
         librarianMenu();
         
