@@ -41,13 +41,12 @@ bool readerLogin(string loginUser, string passwordUser){
                     break;
                 }
             }
-            
         }
         else
             cout << "readers.txt doesn't open" << endl;
             
         fin.close();
-    cout << "You're not registered yet." << endl;
+    cout << "Incorrect login or password." << endl;
     return false;
 }
 
@@ -77,7 +76,7 @@ bool librarianLogin(string loginUser, string passwordUser){
             cout << "librarian.txt doesn't open" << endl;
         
         fin.close();
-    cout << "You're not registered yet." << endl;
+    cout << "Incorrect login or password." << endl;
     return false;
 }
 
@@ -122,11 +121,56 @@ void allBooks(){
         fin.close();
 }
 
-string searchBook() {
+void searchBook() {
     string book;
     ifstream fin;
         fin.open("books.txt");
         if(fin.is_open()){
+            vector <string> allBooksTxt;
+            vector <string> allBookNamesTxt;
+            vector <string> allBookAuthorsTxt;
+            vector <string> allBookYearsTxt;
+            while(!fin.eof()){
+                book = "";
+                getline(fin,book);
+                int dividerPosition1 = book.find("\"");
+                
+                int dividerPosition2;
+                int findDividerPosition2 = -1;
+                do {
+                    findDividerPosition2 = book.find("\"", findDividerPosition2 + 1);
+                    if (findDividerPosition2 != -1)
+                        dividerPosition2 = findDividerPosition2 - dividerPosition1 - 1;
+                } while (findDividerPosition2 != -1);
+                
+                int dividerPosition3 = book.find("-") + 1;
+                
+                int dividerPosition4;
+                int findDividerPosition4 = -1;
+                do {
+                    findDividerPosition4 = book.find("-", findDividerPosition4 + 1);
+                    if (findDividerPosition4 != -1)
+                        dividerPosition4 = findDividerPosition4 - dividerPosition3 - 2;
+                } while (findDividerPosition4 != -1);
+                
+                int dividerPosition5;
+                int findDividerPosition5 = -1;
+                do {
+                    findDividerPosition5 = book.find("-", findDividerPosition5 + 1);
+                    if (findDividerPosition5 != -1)
+                        dividerPosition5 = findDividerPosition5 + 2;
+                } while (findDividerPosition5 != -1);
+                
+                string booksTxt = book.substr(dividerPosition1);
+                allBooksTxt.push_back(booksTxt);
+                string bookNameTxt = book.substr(dividerPosition1 + 1, dividerPosition2);
+                allBookNamesTxt.push_back(bookNameTxt);
+                string bookAuthorTxt = book.substr(dividerPosition3 + 1, dividerPosition4);
+                allBookAuthorsTxt.push_back(bookAuthorTxt);
+                string bookYearTxt = book.substr(dividerPosition5);
+                allBookYearsTxt.push_back(bookYearTxt);
+            }
+            
             int bookOption;
             cout << " --------------------------\n";
             cout << "|Search by:                |\n";
@@ -137,27 +181,24 @@ string searchBook() {
             cout << "Choose an option: ";
             cin >> bookOption;
             cout << endl;
+            
+            string bookExist = "";
             switch (bookOption){
                 case 1:{
                     string bookName;
                     cout << "Enter book name: ";
                     cin.ignore();
                     getline(cin, bookName);
-                    while(!fin.eof()){
-                        book = "";
-                        getline(fin,book);
-                        int dividerPosition1 = book.find("\"");
-                        int dividerPosition2;
-                        int findDividerPosition2 = -1;
-                        do {
-                            findDividerPosition2 = book.find("\"", findDividerPosition2 + 1);
-                            if (findDividerPosition2 != -1)
-                                dividerPosition2 = findDividerPosition2 - dividerPosition1 - 1;
-                        } while (findDividerPosition2 != -1);
-                        string bookNameTxt = book.substr(dividerPosition1 + 1, dividerPosition2);
-                        if (bookNameTxt == bookName)
-                            cout << book.substr(dividerPosition1) << endl;
+                    
+                    for (int i = 0; i < allBookNamesTxt.size(); i++){
+                        if (bookName == allBookNamesTxt[i]){
+                            bookExist =  allBooksTxt[i];
+                        }
                     }
+                    if (bookExist != "")
+                        cout << bookExist << endl;
+                    else 
+                            cout << "This book has not yet been added to the library.\n";
                     break;
                 }
                 case 2:{
@@ -165,22 +206,15 @@ string searchBook() {
                     cout << "Enter book's author: ";
                     cin.ignore();
                     getline(cin, bookAuthor);
-                    while(!fin.eof()){
-                        book = "";
-                        getline(fin,book);
-                        int dividerPosition1 = book.find("-") + 1;
-                        int dividerPosition2;
-                        int findDividerPosition2 = -1;
-                        do {
-                            findDividerPosition2 = book.find("-", findDividerPosition2 + 1);
-                            if (findDividerPosition2 != -1)
-                                dividerPosition2 = findDividerPosition2 - dividerPosition1 - 2;
-                        } while (findDividerPosition2 != -1);
-                        string bookAuthorTxt = book.substr(dividerPosition1 + 1, dividerPosition2);
-                        int dividerPositionStart = book.find("\"");
-                        if (bookAuthorTxt == bookAuthor)
-                            cout << book.substr(dividerPositionStart) << endl;
+                    for (int i = 0; i < allBookAuthorsTxt.size(); i++){
+                        if (bookAuthor == allBookAuthorsTxt[i]){
+                            bookExist =  allBooksTxt[i];
+                        }
                     }
+                    if (bookExist != "")
+                        cout << bookExist << endl;
+                    else 
+                            cout << "This book has not yet been added to the library.\n";
                     break;
                 }
                 case 3:{
@@ -188,22 +222,15 @@ string searchBook() {
                     cout << "Enter book's year: ";
                     cin.ignore();
                     getline(cin, bookYear);
-                    while(!fin.eof()){
-                        book = "";
-                        getline(fin,book);
-                        // int dividerPosition1 = book.find("-") + 1;
-                        int dividerPosition2;
-                        int findDividerPosition2 = -1;
-                        do {
-                            findDividerPosition2 = book.find("-", findDividerPosition2 + 1);
-                            if (findDividerPosition2 != -1)
-                                dividerPosition2 = findDividerPosition2 + 2;
-                        } while (findDividerPosition2 != -1);
-                        string bookYearTxt = book.substr(dividerPosition2);
-                        int dividerPositionStart = book.find("\"");
-                        if (bookYearTxt == bookYear)
-                            cout << book.substr(dividerPositionStart) << endl;
+                    for (int i = 0; i < allBookYearsTxt.size(); i++){
+                        if (bookYear == allBookYearsTxt[i]){
+                            bookExist =  allBooksTxt[i];
+                        }
                     }
+                    if (bookExist != "")
+                        cout << bookExist << endl;
+                    else 
+                            cout << "This book has not yet been added to the library.\n";
                     break;                    
                 }
             }
