@@ -241,6 +241,59 @@ void searchBook() {
         fin.close();
 }
 
+void allReaders(){
+    ifstream fin;
+        fin.open("readers.txt");
+        if(fin.is_open()){
+            while(!fin.eof() ){
+                string reader;
+                getline(fin, reader);
+                int dividerPosition = reader.find(" ");
+                string readerTxt = reader.substr(0, dividerPosition);
+                cout << readerTxt << endl;
+            }
+            cout << endl;
+        }
+        else
+            cout << "readers.txt doesn't open" << endl;
+            
+        fin.close();
+}
+
+void searchReader(){
+    vector <string> readersList;
+    ifstream fin;
+        fin.open("readers.txt");
+        if(fin.is_open()){
+            while(!fin.eof() ){
+                string reader;
+                getline(fin, reader);
+                int dividerPosition = reader.find(" ");
+                string readerTxt = reader.substr(0, dividerPosition);
+                readersList.push_back(readerTxt);
+            }
+            string readerName;
+            bool readerExist = 0;
+            cout << "Enter reader's name: ";
+            cin >> readerName;
+            for (int i = 0; i < readersList.size(); i++){
+                if (readerName == readersList[i]){
+                    readerExist = 1;
+                    break;
+                }
+            }
+            if (readerExist)
+                cout << "User is found.\n" << endl;
+            else
+                cout << "User is not found.\n" << endl;
+        }
+        else
+            cout << "readers.txt doesn't open" << endl;
+            
+        fin.close();
+    
+}
+
 int main()
 {
     string accType, loginUser, passwordUser;
@@ -271,10 +324,10 @@ int main()
                 //     myFavourite();
                 //     break;
                 // case 5:
-                //     myBalance()
+                //     myBalance();
                 //     break;
                 // case 6:
-                //     buyBook
+                //     buyBook();
                 //     break;
             }
             string goBackMenu;
@@ -306,12 +359,12 @@ int main()
                 case 2:
                     searchBook();
                     break;
-                // case 3:
-                //     allReaders();
-                //     break;
-                // case 4:
-                //     searchReader();
-                //     break;
+                case 3:
+                    allReaders();
+                    break;
+                case 4:
+                    searchReader();
+                    break;
             }
             string goBackMenu;
             if (option != 5){
