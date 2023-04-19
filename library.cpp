@@ -4,9 +4,9 @@
 using namespace std;
 
 void accountType (string *accType){
-    cout << "Enter account type: ";
+    cout << "Enter account type(1 for reader, 2 for librarian): ";
     cin >> *accType;
-    while (*accType != "reader" && *accType != "librarian") {
+    while (*accType != "1" && *accType != "2") {
         cout << "Enter correct account type: ";
         cin >> *accType;
     } 
@@ -86,20 +86,21 @@ void readerMenu(){
     cout << "|2.Search book      |\n";
     cout << "|3.Add to Favourites|\n";
     cout << "|4.My Favourites    |\n";
-    cout << "|5.My Balance       |\n";
-    cout << "|6.Buy a book       |\n";
+    cout << "|5.Borrow a book    |\n";
+    cout << "|6.My Borrowed Books|\n";
     cout << "|7.Exit             |\n";
     cout << " --------------------\n";
 }
 
 void librarianMenu(){
-    cout << " --------MENU--------\n";
-    cout << "|1.All books         |\n";
-    cout << "|2.Search book       |\n";
-    cout << "|3.All Readers       |\n";
-    cout << "|4.Search reader     |\n";
-    cout << "|5.Exit              |\n";
-    cout << " --------------------\n";
+    cout << " ----------MENU----------\n";
+    cout << "|1.All books             |\n";
+    cout << "|2.Search book           |\n";
+    cout << "|3.All Readers           |\n";
+    cout << "|4.Search reader         |\n";
+    cout << "|5.List of borrowed books|\n";
+    cout << "|6.Exit                  |\n";
+    cout << " ------------------------\n";
 }
 
 void allBooks(){
@@ -198,7 +199,7 @@ void searchBook() {
                     if (bookExist != "")
                         cout << bookExist << endl;
                     else 
-                            cout << "This book has not yet been added to the library.\n";
+                        cout << "This book has not yet been added to the library.\n";
                     break;
                 }
                 case 2:{
@@ -214,7 +215,7 @@ void searchBook() {
                     if (bookExist != "")
                         cout << bookExist << endl;
                     else 
-                            cout << "This book has not yet been added to the library.\n";
+                        cout << "This book has not yet been added to the library.\n";
                     break;
                 }
                 case 3:{
@@ -230,7 +231,7 @@ void searchBook() {
                     if (bookExist != "")
                         cout << bookExist << endl;
                     else 
-                            cout << "This book has not yet been added to the library.\n";
+                        cout << "This book has not yet been added to the library.\n";
                     break;                    
                 }
             }
@@ -242,6 +243,7 @@ void searchBook() {
 }
 
 void allReaders(){
+    cout << "List of readers:\n";
     ifstream fin;
         fin.open("readers.txt");
         if(fin.is_open()){
@@ -261,15 +263,13 @@ void allReaders(){
 }
 
 void searchReader(){
+    string reader;
     vector <string> readersList;
     ifstream fin;
         fin.open("readers.txt");
         if(fin.is_open()){
-            while(!fin.eof() ){
-                string reader;
-                getline(fin, reader);
-                int dividerPosition = reader.find(" ");
-                string readerTxt = reader.substr(0, dividerPosition);
+            while(getline(fin, reader)){
+                string readerTxt = reader.substr(0, reader.find(" "));
                 readersList.push_back(readerTxt);
             }
             string readerName;
@@ -294,14 +294,110 @@ void searchReader(){
     
 }
 
+void favReadersBook (vector <vector <string> > &favourites){
+    string lineTxt;
+    vector <string> readersList, a;
+    
+    a.assign(1, "");
+    
+    ifstream fin;
+    fin.open("readers.txt");
+    if(fin.is_open()){
+        while(getline(fin, lineTxt))
+            readersList.push_back(lineTxt.substr(0, lineTxt.find(" ")));
+    }
+    else
+        cout << "readers.txt doesn't open" << endl;
+    fin.close();
+    
+    for (int i = 0; i < readersList.size(); i++){
+        a[0] = readersList[i];
+        favourites.push_back(a);
+    }
+    
+    favourites[0].push_back("Charlotte’s Web");
+    favourites[2].push_back("Little Women");
+    favourites[2].push_back("Harry Potter");
+    favourites[3].push_back("Charlotte’s Web");
+    favourites[4].push_back("The Hobbit");
+    favourites[4].push_back("The Great Gatsby");
+}
+
+void addFavourite(string loginUser, vector <vector <string> > &favourites){
+    cout << "Which book you want to add to favourites?\n";
+    string favouriteBook;
+    cin.ignore();
+    getline(cin, favouriteBook);
+    
+    string bookName;
+    vector <string> allBookNamesTxt;
+    ifstream ffin;
+    ffin.open("books.txt");
+    if(ffin.is_open()){
+        while(getline(ffin, bookName)){
+            int dividerPosition1 = bookName.find("\"");
+                
+            int dividerPosition2;
+            int findDividerPosition2 = -1;
+            do {
+                findDividerPosition2 = bookName.find("\"", findDividerPosition2 + 1);
+                if (findDividerPosition2 != -1)
+                    dividerPosition2 = findDividerPosition2 - dividerPosition1 - 1;
+            } while (findDividerPosition2 != -1);
+            
+            string bookNameTxt = bookName.substr(dividerPosition1 + 1, dividerPosition2);
+            allBookNamesTxt.push_back(bookNameTxt);
+        }
+    }
+    else
+        cout << "books.txt doesn't open" << endl;
+    ffin.close();
+    
+    bool bookExist = false;
+    for (int i = 0; i < allBookNamesTxt.size(); i++){
+        if (allBookNamesTxt[i] == favouriteBook){
+            bookExist = true;
+            break;
+        }
+    }
+    
+    for (int i = 0; i < favourites.size(); i++){
+        if (favourites[i][0] == loginUser){
+            if (bookExist){
+                favourites[i].push_back(favouriteBook);
+                cout << "This book added to favourites.\n\n";
+                break;
+            }
+            else{
+                cout << "This book has not yet been added to the library.\n\n";
+                break;
+            }
+        }
+    }
+}
+
+void showFavourite(string loginUser, vector <vector <string> > favourites){
+    cout << "List of your favourite books:\n";
+    for (int i = 0; i < favourites.size(); i++){
+        if(loginUser == favourites[i][0]){
+            for (int j = 1; j < favourites[i].size(); j++){
+                cout << favourites[i][j] << endl;
+            }
+        }
+    }
+    cout << endl;
+}
+
 int main()
 {
     string accType, loginUser, passwordUser;
+    vector <vector <string> > favourites;
+    favReadersBook(favourites);
     
     accountType(&accType);
     loginInfo (&loginUser, &passwordUser);
     
-    if(accType == "reader" && readerLogin(loginUser, passwordUser)){
+    if(accType == "1" && readerLogin(loginUser, passwordUser)){
         int option;
         readerMenu();
         
@@ -317,17 +413,17 @@ int main()
                 case 2:
                     searchBook();
                     break;
-                // case 3:
-                //     addFavourite();
-                //     break;
-                // case 4:
-                //     myFavourite();
-                //     break;
+                case 3:
+                    addFavourite(loginUser, favourites);
+                    break;
+                case 4:
+                    showFavourite(loginUser, favourites);
+                    break;
                 // case 5:
-                //     myBalance();
+                //     borrowBook();
                 //     break;
                 // case 6:
-                //     buyBook();
+                //     showBorrowedBooks();
                 //     break;
             }
             string goBackMenu;
@@ -343,7 +439,7 @@ int main()
         }
     }
     
-    else if(accType == "librarian" && librarianLogin(loginUser, passwordUser)){
+    else if(accType == "2" && librarianLogin(loginUser, passwordUser)){
         int option;
         librarianMenu();
         
@@ -365,9 +461,12 @@ int main()
                 case 4:
                     searchReader();
                     break;
+                // case 5:
+                //     borrowedBooksList();
+                //     break;
             }
             string goBackMenu;
-            if (option != 5){
+            if (option != 6){
                 cout << "Want to go to menu? ";
                 cin >> goBackMenu;
                 cout << endl;
