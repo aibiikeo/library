@@ -388,11 +388,119 @@ void showFavourite(string loginUser, vector <vector <string> > favourites){
     cout << endl;
 }
 
+void borrowedReadersBook (vector <vector <string> > &borrowed){
+    string lineTxt;
+    vector <string> readersList, a;
+    
+    a.assign(1, "");
+    
+    ifstream fin;
+    fin.open("readers.txt");
+    if(fin.is_open()){
+        while(getline(fin, lineTxt))
+            readersList.push_back(lineTxt.substr(0, lineTxt.find(" ")));
+    }
+    else
+        cout << "readers.txt doesn't open" << endl;
+    fin.close();
+    
+    for (int i = 0; i < readersList.size(); i++){
+        a[0] = readersList[i];
+        borrowed.push_back(a);
+    }
+    
+    borrowed[0].push_back("The Great Gatsby");
+    borrowed[1].push_back("Charlotte’s Web");
+    borrowed[1].push_back("Little Women");
+    borrowed[2].push_back("Pride and Prejudice");
+    borrowed[3].push_back("Anne Frank");
+    borrowed[3].push_back("The Hobbit");
+    borrowed[4].push_back("Harry Potter");
+}
+
+void borrowBook(string loginUser, vector <vector <string> > &borrowed){
+    cout << "Which book you want to borrow?\n";
+    string borrowBook;
+    cin.ignore();
+    getline(cin, borrowBook);
+    
+    string bookName;
+    vector <string> allBookNamesTxt;
+    ifstream ffin;
+    ffin.open("books.txt");
+    if(ffin.is_open()){
+        while(getline(ffin, bookName)){
+            int dividerPosition1 = bookName.find("\"");
+                
+            int dividerPosition2;
+            int findDividerPosition2 = -1;
+            do {
+                findDividerPosition2 = bookName.find("\"", findDividerPosition2 + 1);
+                if (findDividerPosition2 != -1)
+                    dividerPosition2 = findDividerPosition2 - dividerPosition1 - 1;
+            } while (findDividerPosition2 != -1);
+            
+            string bookNameTxt = bookName.substr(dividerPosition1 + 1, dividerPosition2);
+            allBookNamesTxt.push_back(bookNameTxt);
+        }
+    }
+    else
+        cout << "books.txt doesn't open" << endl;
+    ffin.close();
+    
+    bool bookExist = false;
+    for (int i = 0; i < allBookNamesTxt.size(); i++){
+        if (allBookNamesTxt[i] == borrowBook){
+            bookExist = true;
+            break;
+        }
+    }
+    
+    for (int i = 0; i < borrowed.size(); i++){
+        if (borrowed[i][0] == loginUser){
+            if (bookExist){
+                borrowed[i].push_back(borrowBook);
+                cout << "You borrowed this book.\n\n";
+                break;
+            }
+            else{
+                cout << "This book has not yet been added to the library.\n\n";
+                break;
+            }
+        }
+    }
+}
+
+void showBorrowedBooks(string loginUser, vector <vector <string> > borrowed){
+    cout << "List of your borrowed books:\n";
+    for (int i = 0; i < borrowed.size(); i++){
+        if(loginUser == borrowed[i][0]){
+            for (int j = 1; j < borrowed[i].size(); j++){
+                cout << borrowed[i][j] << endl;
+            }
+        }
+    }
+    cout << endl;
+}
+
+void borrowedBooksList(vector <vector <string> > borrowed){
+    cout << "List of borrowed books:\n";
+    for (int i = 0; i < borrowed.size(); i++){
+        for (int j = 0; j < borrowed[i].size(); j++){
+            cout << borrowed[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+
 int main()
 {
     string accType, loginUser, passwordUser;
     vector <vector <string> > favourites;
     favReadersBook(favourites);
+    vector <vector <string> > borrowed;
+    borrowedReadersBook(borrowed);
     
     accountType(&accType);
     loginInfo (&loginUser, &passwordUser);
@@ -419,12 +527,12 @@ int main()
                 case 4:
                     showFavourite(loginUser, favourites);
                     break;
-                // case 5:
-                //     borrowBook();
-                //     break;
-                // case 6:
-                //     showBorrowedBooks();
-                //     break;
+                case 5:
+                    borrowBook(loginUser, borrowed);
+                    break;
+                case 6:
+                    showBorrowedBooks(loginUser, borrowed);
+                    break;
             }
             string goBackMenu;
             if (option != 7){
@@ -461,9 +569,9 @@ int main()
                 case 4:
                     searchReader();
                     break;
-                // case 5:
-                //     borrowedBooksList();
-                //     break;
+                case 5:
+                    borrowedBooksList(borrowed);
+                    break;
             }
             string goBackMenu;
             if (option != 6){
